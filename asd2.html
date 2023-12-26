@@ -1,11 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Python és HTML együttműködése</title>
 </head>
 <body>
-    
+    <form action="/" method="post" enctype="multipart/form-data">
+        <label for="file">File feltöltése:</label>
+        <input type="file" id="file" name="file">
+        <br>
+        <label for="search">Keresett szöveg:</label>
+        <input type="text" id="search" name="search">
+        <br>
+        <input type="submit" value="Keresés">
+    </form>
+
+    {% if search_result %}
+        <h3>{{ search_result }} találat van a keresett szövegre.</h3>
+    {% endif %}
 </body>
 </html>

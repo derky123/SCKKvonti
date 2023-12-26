@@ -1,16 +1,31 @@
-def olvas_es_szamol(fajl_nev, keresett):
-    try:
-        with open(fajl_nev, 'r', encoding='utf-8') as f:
-            tartalom = f.read()
-            sorok = tartalom.split('\n')
-            db = sum(1 for sor in sorok if keresett in sor)
-        return db
-    except FileNotFoundError:
-        print("A fájl nem található.")
-    except UnicodeDecodeError:
-        print("A fájl nem támogatott karakterkészletet használ.")
+from flask import Flask, render_template, request, redirect, url_for
+import os
+import mimetypes
 
-fajl_neve = "console-2023-12-25.log"
-keresett_szoveg = "Wilson Soliver / TOW elfogadta a következő hívást:"
-db = olvas_es_szamol(fajl_neve, keresett_szoveg)
-print(f"A '{keresett_szoveg}' szöveg a fájlban {db} alkalommal fordul elő.")
+app = Flask(__name__)
+
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        # Fájl feltöltése
+        file = request.files['file']
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+
+        # Keresett szöveg megkeresése a fájlban
+        search = request.form['search']
+        with open(os.path.join(app.config['UPLOAD_FOLDER'], file.filename), 'r') as f:
+            content = f.read()
+            search_result = content.count(search)
+
+        return render_template('index.html', search_result=search_result)
+    else:
+        return render_template('index.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
